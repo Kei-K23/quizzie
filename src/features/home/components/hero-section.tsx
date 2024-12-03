@@ -11,7 +11,7 @@ export function HeroSection() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="text-center space-y-8"
+      className="text-center space-y-8 pb-12 pt-32"
     >
       <motion.h1
         initial={{ opacity: 0, y: 20 }}
@@ -19,8 +19,7 @@ export function HeroSection() {
         transition={{ delay: 0.2, duration: 0.5 }}
         className="text-4xl md:text-6xl font-bold tracking-tight"
       >
-        Challenge Your Mind with{" "}
-        <span className="text-primary">QuizMaster</span>
+        Challenge Your Mind with <span className="text-primary">Quizzie</span>
       </motion.h1>
 
       <motion.p
