@@ -1,0 +1,152 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String          @id @default(cuid())
+  name          String?
+  email         String          @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  Authenticator Authenticator[]
+
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  QuizTaken    QuizTaken[]
+  UserStat     UserStat?
+  Leaderboard  Leaderboard?
+  achievements Achievement[]
+  badges       Badge[]
+  streaks      Streak?
+}
+
+model Account {
+  id                String   @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?  @db.Text
+  session_state     String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Authenticator {
+  credentialID         String  @unique
+  userId               String
+  providerAccountId    String
+  credentialPublicKey  String
+  counter              Int
+  credentialDeviceType String
+  credentialBackedUp   Boolean
+  transports           String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, credentialID])
+}
+
+model QuizTaken {
+  id           String   @id @default(cuid())
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String
+  category     String   @db.VarChar(50)
+  difficulty   String   @db.VarChar(20)
+  questionType String
+  status       String
+  timeTaken    Int
+  score        Int      @default(0)
+  quizDate     DateTime @default(now())
+
+  @@index([category])
+  @@index([difficulty])
+  @@index([quizDate])
+}
+
+model UserStat {
+  userId              String   @id
+  user                User     @relation(fields: [userId], references: [id])
+  totalQuizzes        Int      @default(0)
+  totalCorrectAnswers Int      @default(0)
+  totalWrongAnswers   Int      @default(0)
+  averageScore        Decimal  @default(0.00) @db.Decimal(5, 2)
+  preferredCategory   String?  @db.VarChar(50)
+  preferredDifficulty String?  @db.VarChar(20)
+  lastActive          DateTime @default(now())
+  level               Int      @default(1)
+  xp                  Int      @default(0)
+}
+
+model Leaderboard {
+  userId      String   @id
+  user        User     @relation(fields: [userId], references: [id])
+  rank        Int
+  score       Int
+  lastUpdated DateTime @default(now())
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  icon        String
+  unlockedAt  DateTime @default(now())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, name])
+}
+
+model Badge {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  icon        String
+  unlockedAt  DateTime @default(now())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, name])
+}
+
+model Streak {
+  userId          String   @id
+  user            User     @relation(fields: [userId], references: [id])
+  currentStreak   Int      @default(0)
+  longestStreak   Int      @default(0)
+  lastQuizDate    DateTime @default(now())
+  streakStartDate DateTime @default(now())
+}
