@@ -59,7 +59,13 @@ export default function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button onClick={() => signIn("google")}>Sign In</Button>
+            <Button
+              onClick={() => {
+                signIn("github");
+              }}
+            >
+              Sign In
+            </Button>
           )}
         </div>
       </div>

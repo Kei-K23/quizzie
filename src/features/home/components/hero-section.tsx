@@ -3,9 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Brain, Trophy, Users } from "lucide-react";
+import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 
 export function HeroSection() {
+  const { data: session } = useSession();
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -38,18 +40,30 @@ export function HeroSection() {
         transition={{ delay: 0.6, duration: 0.5 }}
         className="flex justify-center gap-4 flex-wrap"
       >
-        <Link href="/quiz">
-          <Button size="lg" className="gap-2">
-            <Brain className="w-5 h-5" />
-            Start Quiz
+        {session ? (
+          <>
+            <Link href="/quiz">
+              <Button size="lg" className="gap-2">
+                <Brain className="w-5 h-5" />
+                Start Quiz
+              </Button>
+            </Link>
+            <Link href="/leaderboard">
+              <Button size="lg" variant="outline" className="gap-2">
+                <Trophy className="w-5 h-5" />
+                View Leaderboard
+              </Button>
+            </Link>
+          </>
+        ) : (
+          <Button
+            onClick={() => {
+              signIn("github");
+            }}
+          >
+            Sign In
           </Button>
-        </Link>
-        <Link href="/leaderboard">
-          <Button size="lg" variant="outline" className="gap-2">
-            <Trophy className="w-5 h-5" />
-            View Leaderboard
-          </Button>
-        </Link>
+        )}
       </motion.div>
 
       <motion.div
