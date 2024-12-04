@@ -7,9 +7,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { QuizResult } from "@/components/quiz-result";
 import { Loader2 } from "lucide-react";
 import { fetchQuizQuestions, Question } from "@/lib/api/quiz";
+import { QuizResult } from "@/features/quiz/components/quiz-result";
 // import { Timer } from "@/components/timer";
 
 export default function QuizPage() {

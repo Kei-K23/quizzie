@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { Button } from "./ui/button";
 import { Brain, LogOut, User } from "lucide-react";
 import {
@@ -12,6 +12,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ThemeToggle } from "./theme-toggle";
+import AuthDialog from "./auth-dialog";
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -59,13 +60,7 @@ export default function Navbar() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button
-              onClick={() => {
-                signIn("github");
-              }}
-            >
-              Sign In
-            </Button>
+            <AuthDialog />
           )}
         </div>
       </div>

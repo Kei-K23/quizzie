@@ -1,9 +1,10 @@
 "use client";
 
+import AuthDialog from "@/components/auth-dialog";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Brain, Trophy, Users } from "lucide-react";
-import { signIn, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 
 export function HeroSection() {
@@ -56,13 +57,7 @@ export function HeroSection() {
             </Link>
           </>
         ) : (
-          <Button
-            onClick={() => {
-              signIn("github");
-            }}
-          >
-            Sign In
-          </Button>
+          <AuthDialog />
         )}
       </motion.div>
 

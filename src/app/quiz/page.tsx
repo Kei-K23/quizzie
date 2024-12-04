@@ -1,4 +1,4 @@
-import { Categories } from "@/features/home/components/categories";
+import { Categories } from "@/features/quiz/components/categories";
 import React from "react";
 
 export default function QuizPage() {

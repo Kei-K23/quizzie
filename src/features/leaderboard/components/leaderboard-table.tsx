@@ -46,6 +46,8 @@ export function LeaderboardTable({
     }
   };
 
+  console.log(leaders);
+
   return (
     <Table>
       <TableHeader>
@@ -61,7 +63,7 @@ export function LeaderboardTable({
       <TableBody>
         {leaders.map((leader, index) => (
           <motion.tr
-            key={leader.id}
+            key={`${leader.id}-${index}`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.1 }}

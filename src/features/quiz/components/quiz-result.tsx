@@ -3,11 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { Button } from "./ui/button";
-import { Card } from "./ui/card";
 import Confetti from "react-confetti";
 import { Award, Clock, RotateCcw, Trophy, User } from "lucide-react";
 import { toast } from "sonner";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface QuizResultProps {
   score: number;
