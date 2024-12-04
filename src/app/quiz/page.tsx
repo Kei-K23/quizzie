@@ -4,7 +4,7 @@ import React from "react";
 export default function QuizPage() {
   return (
     <div>
-      <Categories title="Take a quize to improve your Knowledge" />
+      <Categories title="Take a quiz to improve your Knowledge" />
     </div>
   );
 }
