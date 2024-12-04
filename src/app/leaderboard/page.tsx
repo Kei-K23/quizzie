@@ -6,8 +6,8 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { LeaderboardTable } from "@/components/leaderboard/leaderboard-table";
-import { LeaderboardStats } from "@/components/leaderboard/leaderboard-stats";
 import { CategoryLeaders } from "@/components/leaderboard/category-leaders";
+import { LeaderboardStats } from "@/features/leaderboard/components/leaderboard-stats";
 
 export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
