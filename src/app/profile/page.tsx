@@ -7,10 +7,10 @@ import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ProfileStats } from "@/components/profile/profile-stats";
-import { ProfileAchievements } from "@/components/profile/profile-achievements";
 import { QuizHistory } from "@/components/profile/quiz-history";
 import { UserBadges } from "@/components/profile/user-badges";
+import { ProfileStats } from "@/features/profile/components/profile-stats";
+import { ProfileAchievements } from "@/features/profile/components/profile-achievements";
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
