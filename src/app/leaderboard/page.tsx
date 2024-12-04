@@ -5,9 +5,9 @@ import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { CategoryLeaders } from "@/components/leaderboard/category-leaders";
 import { LeaderboardStats } from "@/features/leaderboard/components/leaderboard-stats";
 import { LeaderboardTable } from "@/features/leaderboard/components/leaderboard-table";
+import { CategoryLeaders } from "@/features/leaderboard/components/category-leaders";
 
 export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
