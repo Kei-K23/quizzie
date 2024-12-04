@@ -16,11 +16,10 @@ export interface QuizResponse {
 
 export async function fetchQuizQuestions(
   category: string,
-  difficulty: string = "medium",
   amount: number = 10
 ) {
   const categoryId = getCategoryId(category);
-  const url = `https://opentdb.com/api.php?amount=${amount}&category=${categoryId}&difficulty=${difficulty}&type=multiple`;
+  const url = `https://opentdb.com/api.php?amount=${amount}&category=${categoryId}&type=multiple`;
 
   try {
     const response = await axios.get<QuizResponse>(url);

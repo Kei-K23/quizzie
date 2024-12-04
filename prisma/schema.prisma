@@ -80,16 +80,19 @@ model Authenticator {
 }
 
 model QuizTaken {
-  id           String   @id @default(cuid())
-  user         User     @relation(fields: [userId], references: [id])
-  userId       String
-  category     String   @db.VarChar(50)
-  difficulty   String   @db.VarChar(20)
-  questionType String
-  status       String
-  timeTaken    Int
-  score        Int      @default(0)
-  quizDate     DateTime @default(now())
+  id             String   @id @default(cuid())
+  user           User     @relation(fields: [userId], references: [id])
+  userId         String
+  category       String   @db.VarChar(50)
+  difficulty     String   @db.VarChar(20)
+  questionType   String
+  totalQuestions Int
+  correctAnswers Int
+  wrongAnswers   Int
+  status         String
+  timeTaken      Int
+  score          Int      @default(0)
+  quizDate       DateTime @default(now())
 
   @@index([category])
   @@index([difficulty])

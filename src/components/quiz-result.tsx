@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
@@ -25,44 +25,60 @@ export function QuizResult({
   const router = useRouter();
   const [showConfetti, setShowConfetti] = useState(true);
   const percentage = (score / totalQuestions) * 100;
+  const hasSavedResult = useRef(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    const saveResult = async () => {
-      try {
-        const response = await fetch("/api/quiz/result", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            category,
-            score,
-            timeTaken,
-          }),
-        });
+    if (!hasSavedResult.current) {
+      hasSavedResult.current = true;
 
-        if (!response.ok) throw new Error("Failed to save result");
+      const saveResult = async () => {
+        try {
+          const response = await fetch("/api/quiz/result", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              category,
+              score,
+              timeTaken,
+            }),
+          });
 
-        const data = await response.json();
-        if (data.achievement) {
-          //   toast({
-          //     title: "Achievement Unlocked! 🎉",
-          //     description: data.achievement.name,
-          //   });
-          toast.success("Achievement Unlocked! 🎉");
+          if (!response.ok) throw new Error("Failed to save result");
+
+          const data = await response.json();
+          if (data.achievement) {
+            //   toast({
+            //     title: "Achievement Unlocked! 🎉",
+            //     description: data.achievement.name,
+            //   });
+            toast.success("Achievement Unlocked! 🎉");
+          }
+        } catch (error) {
+          console.error("Error saving result:", error);
         }
-      } catch (error) {
-        console.error("Error saving result:", error);
+      };
+
+      saveResult();
+
+      // Start timer for confetti
+      timerRef.current = setTimeout(() => {
+        setShowConfetti(false);
+      }, 3000);
+    }
+
+    // Cleanup timer on component unmount
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
       }
     };
-
-    saveResult();
-
-    const timer = setTimeout(() => setShowConfetti(false), 5000);
-    return () => clearTimeout(timer);
-  }, [category, score, timeTaken, toast]);
+  }, [category, score, timeTaken]);
 
   return (
     <>
-      {showConfetti && percentage >= 70 && <Confetti />}
+      {showConfetti && percentage >= 10 && <Confetti />}
       <Card className="max-w-2xl mx-auto p-8">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}

@@ -7,7 +7,7 @@ export default function Home() {
     <div className="space-y-20">
       <HeroSection />
       <Features />
-      <Categories />
+      <Categories title="Quiz Categories" />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -10,7 +10,7 @@ import { Progress } from "@/components/ui/progress";
 import { QuizResult } from "@/components/quiz-result";
 import { Loader2 } from "lucide-react";
 import { fetchQuizQuestions, Question } from "@/lib/api/quiz";
-import { Timer } from "@/components/timer";
+// import { Timer } from "@/components/timer";
 
 export default function QuizPage() {
   const { category } = useParams();
@@ -21,7 +21,8 @@ export default function QuizPage() {
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [timeTaken, setTimeTaken] = useState(0);
+  //   const [timeTaken, setTimeTaken] = useState(0);
+  const fetchQuizRef = useRef(false);
 
   useEffect(() => {
     if (!session) {
@@ -37,11 +38,16 @@ export default function QuizPage() {
       } catch (error) {
         console.error("Error loading questions:", error);
         setLoading(false);
+      } finally {
+        fetchQuizRef.current = true;
       }
     };
 
-    loadQuestions();
-  }, [category, session, router]);
+    if (!fetchQuizRef.current) {
+      fetchQuizRef.current = true;
+      loadQuestions();
+    }
+  }, []);
 
   const handleAnswer = (answer: string) => {
     const correct = answer === questions[currentQuestion].correct_answer;
@@ -68,7 +74,7 @@ export default function QuizPage() {
         score={score}
         totalQuestions={questions.length}
         category={category as string}
-        timeTaken={timeTaken}
+        timeTaken={0}
       />
     );
   }
@@ -78,7 +84,7 @@ export default function QuizPage() {
       <div className="mb-8 space-y-4">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold capitalize">{category} Quiz</h1>
-          <Timer onTimeUpdate={setTimeTaken} />
+          {/* <Timer onTimeUpdate={setTimeTaken} /> */}
         </div>
         <Progress
           value={(currentQuestion / questions.length) * 100}

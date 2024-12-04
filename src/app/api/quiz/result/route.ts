@@ -5,52 +5,87 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const session = await auth();
-    if (!session?.user) {
+
+    if (!session?.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { category, score, timeTaken } = await req.json();
+    const body = await req.json();
+    if (!body || typeof body !== "object") {
+      return new NextResponse("Invalid request body", { status: 400 });
+    }
+
+    const { category, score, timeTaken } = body as {
+      category: string;
+      score: number;
+      timeTaken: number;
+    };
+
+    if (
+      !category ||
+      typeof score !== "number" ||
+      typeof timeTaken !== "number"
+    ) {
+      return new NextResponse("Missing or invalid fields", { status: 400 });
+    }
+
+    // TODO: remove hard-coded total quiz number
+    const totalQuestions = 10;
+    const correctAnswers = score;
+    const wrongAnswers = totalQuestions - correctAnswers;
 
     // Save quiz result
-    const quizTaken = await prisma.quizTaken.create({
+    await prisma.quizTaken.create({
       data: {
-        id: session.user.id,
         category,
         score,
         timeTaken,
         difficulty: "medium",
         questionType: "multiple",
         status: score >= 7 ? "PASSED" : "FAILED",
+        correctAnswers,
+        wrongAnswers,
+        totalQuestions,
+        userId: session.user.id!,
       },
     });
 
     // Update user stats
+    const stats = await prisma.userStat.findUnique({
+      where: { userId: session.user.id! },
+    });
+    const newAverageScore = stats
+      ? (stats.averageScore.toNumber() * stats.totalQuizzes + score) /
+        (stats.totalQuizzes + 1)
+      : score;
+
+    // Update averageScore
     await prisma.userStat.upsert({
       where: { userId: session.user.id },
       update: {
-        totalQuizzes: { increment: 1 },
+        totalQuizzes: { increment: totalQuestions },
         totalCorrectAnswers: { increment: score },
-        totalWrongAnswers: { increment: 10 - score },
+        totalWrongAnswers: { increment: totalQuestions - score },
         averageScore: {
-          set: prisma.userStat
-            .findUnique({ where: { userId: session.user.id } })
-            .then((stats) => {
-              if (!stats) return score;
-              return (
-                (stats.averageScore.toNumber() * stats.totalQuizzes + score) /
-                (stats.totalQuizzes + 1)
-              );
-            }),
+          set: newAverageScore,
         },
       },
       create: {
-        userId: session.user.id,
-        totalQuizzes: 1,
+        userId: session.user.id!,
+        totalQuizzes: totalQuestions,
         totalCorrectAnswers: score,
-        totalWrongAnswers: 10 - score,
+        totalWrongAnswers: totalQuestions - score,
         averageScore: score,
       },
     });
+
+    // Update streak
+    const streak = await prisma.streak.findUnique({
+      where: { userId: session.user.id! },
+    });
+    const newLongestStreak = streak
+      ? Math.max(streak.longestStreak, streak.currentStreak + 1)
+      : 1;
 
     // Update streak
     await prisma.streak.upsert({
@@ -60,13 +95,12 @@ export async function POST(req: Request) {
           increment: 1,
         },
         longestStreak: {
-          increment: (streak) =>
-            streak.currentStreak + 1 > streak.longestStreak ? 1 : 0,
+          set: newLongestStreak,
         },
         lastQuizDate: new Date(),
       },
       create: {
-        userId: session.user.id,
+        userId: session.user.id!,
         currentStreak: 1,
         longestStreak: 1,
         lastQuizDate: new Date(),
@@ -78,7 +112,7 @@ export async function POST(req: Request) {
     if (score === 10) {
       achievement = await prisma.achievement.create({
         data: {
-          userId: session.user.id,
+          userId: session.user.id!,
           name: "Perfect Score",
           description: "Score 100% on a quiz",
           icon: "trophy",
