@@ -31,7 +31,7 @@ export function ProfileStats({ stats }: ProfileStatsProps) {
     {
       icon: Award,
       label: "Average Score",
-      value: `${stats.averageScore.toFixed(1)}%`,
+      value: `${stats.averageScore}%`,
     },
     {
       icon: Flame,
