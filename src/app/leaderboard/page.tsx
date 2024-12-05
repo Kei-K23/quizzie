@@ -18,6 +18,7 @@ export default function LeaderboardPage() {
       try {
         const response = await fetch("/api/leaderboard");
         const data = await response.json();
+
         setLeaderboardData(data);
         setLoading(false);
       } catch (error) {

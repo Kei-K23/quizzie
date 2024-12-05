@@ -28,7 +28,7 @@ export async function GET() {
     monthStart.setDate(1);
     monthStart.setHours(0, 0, 0, 0);
 
-    const monthlyLeaders = await prisma.quizTaken.groupBy({
+    const monthlyLeadersRaw = await prisma.quizTaken.groupBy({
       by: ["userId"],
       where: {
         quizDate: {
@@ -46,12 +46,37 @@ export async function GET() {
       take: 100,
     });
 
+    const monthlyLeaders = await Promise.all(
+      monthlyLeadersRaw.map(async (leader, index) => {
+        const user = await prisma.user.findUnique({
+          where: { id: leader.userId },
+          select: {
+            id: true,
+            name: true,
+            image: true,
+            UserStat: {
+              select: {
+                averageScore: true,
+                totalQuizzes: true,
+              },
+            },
+          },
+        });
+
+        return {
+          ...user,
+          score: leader._sum.score,
+          rank: index + 1,
+        };
+      })
+    );
+
     // Get weekly leaderboard
     const weekStart = new Date();
     weekStart.setDate(weekStart.getDate() - weekStart.getDay());
     weekStart.setHours(0, 0, 0, 0);
 
-    const weeklyLeaders = await prisma.quizTaken.groupBy({
+    const weeklyLeadersRaw = await prisma.quizTaken.groupBy({
       by: ["userId"],
       where: {
         quizDate: {
@@ -68,6 +93,31 @@ export async function GET() {
       },
       take: 100,
     });
+
+    const weeklyLeaders = await Promise.all(
+      weeklyLeadersRaw.map(async (leader, index) => {
+        const user = await prisma.user.findUnique({
+          where: { id: leader.userId },
+          select: {
+            id: true,
+            name: true,
+            image: true,
+            UserStat: {
+              select: {
+                averageScore: true,
+                totalQuizzes: true,
+              },
+            },
+          },
+        });
+
+        return {
+          ...user,
+          score: leader._sum.score,
+          rank: index + 1,
+        };
+      })
+    );
 
     // Get category leaders
     const categories = await prisma.quizTaken.groupBy({

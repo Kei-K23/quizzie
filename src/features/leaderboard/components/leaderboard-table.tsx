@@ -19,8 +19,10 @@ interface Leader {
   image: string;
   score: number;
   rank: number;
-  quizzesTaken: number;
-  averageScore: number;
+  UserStat: {
+    averageScore: number;
+    totalQuizzes: number;
+  };
   streak: number;
 }
 
@@ -45,8 +47,6 @@ export function LeaderboardTable({
         return null;
     }
   };
-
-  console.log(leaders);
 
   return (
     <Table>
@@ -91,10 +91,10 @@ export function LeaderboardTable({
             </TableCell>
             <TableCell>{leader.score}</TableCell>
             <TableCell className="hidden md:table-cell">
-              {leader.quizzesTaken}
+              {leader.UserStat.averageScore}
             </TableCell>
             <TableCell className="hidden md:table-cell">
-              {leader.averageScore}%
+              {leader.UserStat.averageScore}%
             </TableCell>
             <TableCell className="hidden md:table-cell">
               <div className="flex items-center gap-1">
