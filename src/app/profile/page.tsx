@@ -11,12 +11,13 @@ import { ProfileStats } from "@/features/profile/components/profile-stats";
 import { ProfileAchievements } from "@/features/profile/components/profile-achievements";
 import { QuizHistory } from "@/features/profile/components/quiz-history";
 import { UserBadges } from "@/features/profile/components/user-badges";
+import { ProfileData } from "@/features/profile/type";
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [profileData, setProfileData] = useState<any>(null);
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -28,6 +29,7 @@ export default function ProfilePage() {
       try {
         const response = await fetch("/api/profile");
         const data = await response.json();
+        console.log(data);
 
         setProfileData(data);
         setLoading(false);

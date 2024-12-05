@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -8,16 +9,19 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { LeaderboardStats } from "@/features/leaderboard/components/leaderboard-stats";
 import { LeaderboardTable } from "@/features/leaderboard/components/leaderboard-table";
 import { CategoryLeaders } from "@/features/leaderboard/components/category-leaders";
+import { LeaderboardData } from "@/features/leaderboard/type";
 
 export default function LeaderboardPage() {
   const [loading, setLoading] = useState(true);
-  const [leaderboardData, setLeaderboardData] = useState<any>(null);
+  const [leaderboardData, setLeaderboardData] =
+    useState<LeaderboardData | null>(null);
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
         const response = await fetch("/api/leaderboard");
         const data = await response.json();
+        console.log(data);
 
         setLeaderboardData(data);
         setLoading(false);
@@ -48,7 +52,7 @@ export default function LeaderboardPage() {
     >
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
         <h1 className="text-3xl font-bold">Leaderboard</h1>
-        <LeaderboardStats stats={leaderboardData.stats} />
+        <LeaderboardStats stats={leaderboardData?.stats!} />
       </div>
 
       <Tabs defaultValue="global" className="space-y-6">
@@ -62,8 +66,8 @@ export default function LeaderboardPage() {
         <TabsContent value="global">
           <Card className="p-6">
             <LeaderboardTable
-              leaders={leaderboardData.global}
-              currentUserId={leaderboardData.currentUserId}
+              leaders={leaderboardData?.global!}
+              currentUserId={leaderboardData?.currentUserId!}
             />
           </Card>
         </TabsContent>
@@ -71,8 +75,8 @@ export default function LeaderboardPage() {
         <TabsContent value="monthly">
           <Card className="p-6">
             <LeaderboardTable
-              leaders={leaderboardData.monthly}
-              currentUserId={leaderboardData.currentUserId}
+              leaders={leaderboardData?.monthly!}
+              currentUserId={leaderboardData?.currentUserId!}
             />
           </Card>
         </TabsContent>
@@ -80,14 +84,14 @@ export default function LeaderboardPage() {
         <TabsContent value="weekly">
           <Card className="p-6">
             <LeaderboardTable
-              leaders={leaderboardData.weekly}
-              currentUserId={leaderboardData.currentUserId}
+              leaders={leaderboardData?.weekly!}
+              currentUserId={leaderboardData?.currentUserId!}
             />
           </Card>
         </TabsContent>
 
         <TabsContent value="categories">
-          <CategoryLeaders categories={leaderboardData.categories} />
+          <CategoryLeaders categories={leaderboardData?.categories!} />
         </TabsContent>
       </Tabs>
     </motion.div>
