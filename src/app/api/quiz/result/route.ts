@@ -5,36 +5,29 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const session = await auth();
-
     if (!session?.user?.id) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const body = await req.json();
-    if (!body || typeof body !== "object") {
-      return new NextResponse("Invalid request body", { status: 400 });
-    }
-
     const { category, score, timeTaken } = body as {
       category: string;
       score: number;
       timeTaken: number;
     };
 
-    if (
-      !category ||
-      typeof score !== "number" ||
-      typeof timeTaken !== "number"
-    ) {
-      return new NextResponse("Missing or invalid fields", { status: 400 });
-    }
-
-    // TODO: remove hard-coded total quiz number
     const totalQuestions = 10;
     const correctAnswers = score;
     const wrongAnswers = totalQuestions - correctAnswers;
 
-    // Save quiz result
+    const baseXpPerCorrectAnswer = 10;
+    const bonusXpForCompletion = 20;
+    const difficultyMultiplier = { easy: 1, medium: 1.5, hard: 2 };
+    const multiplier = difficultyMultiplier["medium"];
+    const xpEarned =
+      correctAnswers * baseXpPerCorrectAnswer * multiplier +
+      bonusXpForCompletion;
+
     await prisma.quizTaken.create({
       data: {
         category,
@@ -50,77 +43,39 @@ export async function POST(req: Request) {
       },
     });
 
-    // Update user stats
     const stats = await prisma.userStat.findUnique({
       where: { userId: session.user.id! },
     });
-    const newAverageScore = stats
-      ? (stats.averageScore.toNumber() * stats.totalQuizzes + score) /
-        (stats.totalQuizzes + 1)
-      : score;
+    const newXp = (stats?.xp ?? 0) + xpEarned;
+    const newLevel = Math.floor(newXp / 100) + 1;
 
-    // Update averageScore
     await prisma.userStat.upsert({
       where: { userId: session.user.id },
       update: {
-        totalQuizzes: { increment: totalQuestions },
-        totalCorrectAnswers: { increment: score },
-        totalWrongAnswers: { increment: totalQuestions - score },
+        xp: { set: newXp },
+        level: { set: newLevel },
+        totalQuizzes: { increment: 1 },
+        totalCorrectAnswers: { increment: correctAnswers },
+        totalWrongAnswers: { increment: wrongAnswers },
         averageScore: {
-          set: newAverageScore,
+          set: stats
+            ? (stats.averageScore.toNumber() * stats.totalQuizzes + score) /
+              (stats.totalQuizzes + 1)
+            : score,
         },
       },
       create: {
         userId: session.user.id!,
-        totalQuizzes: totalQuestions,
-        totalCorrectAnswers: score,
-        totalWrongAnswers: totalQuestions - score,
+        xp: newXp,
+        level: newLevel,
+        totalQuizzes: 1,
+        totalCorrectAnswers: correctAnswers,
+        totalWrongAnswers: wrongAnswers,
         averageScore: score,
       },
     });
 
-    // Update streak
-    const streak = await prisma.streak.findUnique({
-      where: { userId: session.user.id! },
-    });
-    const newLongestStreak = streak
-      ? Math.max(streak.longestStreak, streak.currentStreak + 1)
-      : 1;
-
-    // Update streak
-    await prisma.streak.upsert({
-      where: { userId: session.user.id },
-      update: {
-        currentStreak: {
-          increment: 1,
-        },
-        longestStreak: {
-          set: newLongestStreak,
-        },
-        lastQuizDate: new Date(),
-      },
-      create: {
-        userId: session.user.id!,
-        currentStreak: 1,
-        longestStreak: 1,
-        lastQuizDate: new Date(),
-      },
-    });
-
-    // Check and award achievements
-    let achievement = null;
-    if (score === 10) {
-      achievement = await prisma.achievement.create({
-        data: {
-          userId: session.user.id!,
-          name: "Perfect Score",
-          description: "Score 100% on a quiz",
-          icon: "trophy",
-        },
-      });
-    }
-
-    return NextResponse.json({ success: true, achievement });
+    return NextResponse.json({ success: true, xpEarned, level: newLevel });
   } catch (error) {
     console.error("Error saving quiz result:", error);
     return new NextResponse("Internal Server Error", { status: 500 });

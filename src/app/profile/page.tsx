@@ -28,6 +28,7 @@ export default function ProfilePage() {
       try {
         const response = await fetch("/api/profile");
         const data = await response.json();
+
         setProfileData(data);
         setLoading(false);
       } catch (error) {
@@ -80,9 +81,9 @@ export default function ProfilePage() {
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
           <span>XP Progress</span>
-          <span>{profileData.stats.xp}/1000 XP</span>
+          <span>{profileData.stats.xp}/10000 XP</span>
         </div>
-        <Progress value={(profileData.stats.xp % 1000) / 10} />
+        <Progress value={(profileData.stats.xp % 1000) / 100} />
       </div>
 
       <Tabs defaultValue="stats" className="space-y-6">

@@ -13,7 +13,7 @@ interface LeaderboardStatsProps {
 
 export function LeaderboardStats({ stats }: LeaderboardStatsProps) {
   return (
-    <div className="flex gap-4">
+    <div className="flex w-full flex-col md:justify-end md:flex-row gap-4">
       <Card className="p-4 flex items-center gap-3">
         <Users className="w-5 h-5 text-primary" />
         <div>

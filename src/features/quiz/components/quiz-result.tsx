@@ -14,6 +14,7 @@ interface QuizResultProps {
   totalQuestions: number;
   category: string;
   timeTaken: number;
+  resetState: () => void;
 }
 
 export function QuizResult({
@@ -21,6 +22,7 @@ export function QuizResult({
   totalQuestions,
   category,
   timeTaken,
+  resetState,
 }: QuizResultProps) {
   const router = useRouter();
   const [showConfetti, setShowConfetti] = useState(true);
@@ -120,7 +122,10 @@ export function QuizResult({
 
           <div className="flex justify-center gap-4 pt-4">
             <Button
-              onClick={() => router.push(`/quiz/${category}`)}
+              onClick={() => {
+                router.push(`/quiz/${category}`);
+                resetState();
+              }}
               className="gap-2"
             >
               <RotateCcw className="w-4 h-4" />

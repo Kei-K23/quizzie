@@ -46,7 +46,7 @@ export default function LeaderboardPage() {
       transition={{ duration: 0.5 }}
       className="space-y-8"
     >
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
         <h1 className="text-3xl font-bold">Leaderboard</h1>
         <LeaderboardStats stats={leaderboardData.stats} />
       </div>

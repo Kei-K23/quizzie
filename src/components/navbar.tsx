@@ -1,18 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
-import { Button } from "./ui/button";
-import { Brain, LogOut, User } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { useSession } from "next-auth/react";
+import { Brain, Trophy } from "lucide-react";
+
 import { ThemeToggle } from "./theme-toggle";
 import AuthDialog from "./auth-dialog";
+import UserDropdown from "./user-dropdown";
+import { Button } from "./ui/button";
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -26,42 +21,26 @@ export default function Navbar() {
         </Link>
 
         <div className="flex items-center gap-4">
-          <ThemeToggle />
-
           {session ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="relative h-8 w-8 rounded-full"
-                >
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={session.user?.image || ""} alt="Avatar" />
-                    <AvatarFallback>
-                      {session.user?.name?.charAt(0) || "U"}
-                    </AvatarFallback>
-                  </Avatar>
+            <>
+              <Link href="/quiz">
+                <Button size="sm" variant="ghost" className="gap-2">
+                  <Brain className="w-5 h-5" />
+                  <span className="hidden md:block">Quiz</span>
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link href="/profile" className="flex items-center gap-2">
-                    <User className="w-4 h-4" />
-                    Profile
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => signOut()}
-                  className="flex items-center gap-2"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Sign Out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+              </Link>
+              <Link href="/leaderboard">
+                <Button size="sm" variant="ghost" className="gap-2">
+                  <Trophy className="w-5 h-5" />
+                  <span className="hidden md:block">Leaderboard</span>
+                </Button>
+              </Link>
+              <UserDropdown />
+            </>
           ) : (
             <AuthDialog />
           )}
+          <ThemeToggle />
         </div>
       </div>
     </nav>
