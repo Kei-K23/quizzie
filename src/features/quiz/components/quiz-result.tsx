@@ -25,10 +25,9 @@ export function QuizResult({
   resetState,
 }: QuizResultProps) {
   const router = useRouter();
-  const [showConfetti, setShowConfetti] = useState(true);
+  const [showConfetti, setShowConfetti] = useState(false);
   const percentage = (score / totalQuestions) * 100;
   const hasSavedResult = useRef(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!hasSavedResult.current) {
@@ -50,10 +49,6 @@ export function QuizResult({
 
           const data = await response.json();
           if (data.achievement) {
-            //   toast({
-            //     title: "Achievement Unlocked! 🎉",
-            //     description: data.achievement.name,
-            //   });
             toast.success("Achievement Unlocked! 🎉");
           }
         } catch (error) {
@@ -63,24 +58,23 @@ export function QuizResult({
 
       saveResult();
 
-      // Start timer for confetti
-      timerRef.current = setTimeout(() => {
-        setShowConfetti(false);
-      }, 3000);
-    }
+      // Show confetti only if the percentage is 70% or higher
+      if (percentage >= 70) {
+        setShowConfetti(true);
+        // Hide confetti after 3 seconds
+        const timer = setTimeout(() => {
+          setShowConfetti(false);
+        }, 3000);
 
-    // Cleanup timer on component unmount
-    return () => {
-      if (timerRef.current) {
-        clearTimeout(timerRef.current);
-        timerRef.current = null;
+        // Cleanup timer on component unmount
+        return () => clearTimeout(timer);
       }
-    };
-  }, [category, score, timeTaken]);
+    }
+  }, [category, score, timeTaken, percentage]);
 
   return (
     <>
-      {showConfetti && percentage >= 10 && <Confetti />}
+      {showConfetti && <Confetti />}
       <Card className="max-w-2xl mx-auto p-8">
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}

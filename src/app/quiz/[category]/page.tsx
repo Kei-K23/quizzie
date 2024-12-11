@@ -22,6 +22,7 @@ export default function QuizPage() {
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [timeTaken, setTimeTaken] = useState(0);
   const [refreshQuestion, setRefreshQuestion] = useState(0);
   const fetchQuizRef = useRef(false);
@@ -38,6 +39,7 @@ export default function QuizPage() {
         setQuestions(data);
         setLoading(false);
       } catch (error) {
+        setError(true);
         console.error("Error loading questions:", error);
         setLoading(false);
       }
@@ -90,6 +92,15 @@ export default function QuizPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <p className="text-center text-red-500">Error loading questions</p>
+        <Button onClick={() => router.refresh()}>Refresh the page</Button>
       </div>
     );
   }

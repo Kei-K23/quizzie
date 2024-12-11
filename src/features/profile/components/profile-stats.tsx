@@ -21,17 +21,17 @@ export function ProfileStats({ stats }: ProfileStatsProps) {
     {
       icon: Brain,
       label: "Total Quizzes",
-      value: stats.totalQuizzes,
+      value: stats.totalQuizzes || 0,
     },
     {
       icon: Target,
       label: "Correct Answers",
-      value: stats.totalCorrectAnswers,
+      value: stats.totalCorrectAnswers || 0,
     },
     {
       icon: Award,
       label: "Average Score",
-      value: `${stats.averageScore}%`,
+      value: `${stats?.averageScore || 0}%`,
     },
     {
       icon: Flame,
